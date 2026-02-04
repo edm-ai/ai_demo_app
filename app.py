@@ -121,7 +121,7 @@ st.title("🌊 Summer Travel Planner")
 st.subheader("Tell me about your dream vacation…")
 
 st.write(
-   "Planning a trip? Looking for beach ideas? Ski Ideas? Adventure? Relaxation?"
+   "Planning a trip? Looking for beach ideas? Ski Ideas? Adventure? Relaxation? "
    "Let’s find your perfect summer destination!"
 )
 
