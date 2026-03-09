@@ -117,6 +117,23 @@ st.markdown(
         border-radius: 12px;
         padding: 10px;
     }
+
+    /* Sidebar text readability */
+    [data-testid="stSidebar"] {
+        background-color: rgba(20, 30, 48, 0.95);
+    }
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] div,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] span {
+        color: #f0f0f0 !important;
+    }
+    [data-testid="stSidebar"] h1,
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3 {
+        color: #ffffff !important;
+        text-shadow: none;
+    }
     </style>
     """,
     unsafe_allow_html=True
@@ -128,7 +145,7 @@ with st.sidebar:
     selected_backend = st.radio(
         "AI Backend",
         options=["Claude (Anthropic)", "ChatGPT (OpenAI)"],
-        index=0,
+        index=1,
     )
 
     if "backend" not in st.session_state:
