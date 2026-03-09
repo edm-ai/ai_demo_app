@@ -1,9 +1,11 @@
 import streamlit as st
 import anthropic
+import openai
 from dotenv import load_dotenv
 
 load_dotenv()
-client = anthropic.Anthropic()
+anthropic_client = anthropic.Anthropic()
+openai_client = openai.OpenAI()
 
 # ===== SYSTEM PROMPT =====
 SYSTEM_PROMPT = """
@@ -120,6 +122,26 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# ===== SIDEBAR: BACKEND TOGGLE =====
+with st.sidebar:
+    st.header("Settings")
+    selected_backend = st.radio(
+        "AI Backend",
+        options=["Claude (Anthropic)", "ChatGPT (OpenAI)"],
+        index=0,
+    )
+
+    if "backend" not in st.session_state:
+        st.session_state.backend = selected_backend
+
+    if selected_backend != st.session_state.backend:
+        st.session_state.backend = selected_backend
+        st.session_state.messages = []
+        st.rerun()
+
+    backend_label = "Claude Sonnet 4.6" if selected_backend == "Claude (Anthropic)" else "GPT-4o"
+    st.caption(f"Model: {backend_label}")
+
 # ===== HEADER =====
 st.title("🌊 Summer Travel Planner")
 st.subheader("Tell me about your dream vacation…")
@@ -146,15 +168,24 @@ if user_input:
     with st.chat_message("user"):
         st.write(user_input)
 
-    response = client.messages.create(
-        model="claude-sonnet-4-6",
-        system=SYSTEM_PROMPT,
-        messages=st.session_state.messages,
-        max_tokens=1024,
-        temperature=0.8,
-    )
-
-    reply = response.content[0].text
+    if st.session_state.backend == "Claude (Anthropic)":
+        response = anthropic_client.messages.create(
+            model="claude-sonnet-4-6",
+            system=SYSTEM_PROMPT,
+            messages=st.session_state.messages,
+            max_tokens=1024,
+            temperature=0.8,
+        )
+        reply = response.content[0].text
+    else:
+        oai_messages = [{"role": "system", "content": SYSTEM_PROMPT}] + st.session_state.messages
+        response = openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=oai_messages,
+            max_tokens=1024,
+            temperature=0.8,
+        )
+        reply = response.choices[0].message.content
 
     st.session_state.messages.append({"role": "assistant", "content": reply})
     with st.chat_message("assistant"):
